@@ -17,8 +17,14 @@ public class LibraryManagementSystem {
 
     private static final BookService bookService = new BookService();
     private static final MemberService memberService = new MemberService();
-    private static final TransactionService transactionService = new TransactionService();
-    private static final NotificationService notificationService = new NotificationService();
+    private static final TransactionService transactionService =
+            new TransactionService();
+    private static final NotificationService notificationService =
+            new NotificationService();
+
+    // Librarian login credentials
+    private static final String LIBRARIAN_USERNAME = "admin";
+    private static final String LIBRARIAN_PASSWORD = "admin123";
 
     public static void main(String[] args) {
 
@@ -38,57 +44,146 @@ public class LibraryManagementSystem {
             switch (choice) {
 
                 case 1:
-                    librarianDashboard();
+                    librarianLogin();
                     break;
 
                 case 2:
-                    memberDashboard();
+                    memberLogin();
                     break;
 
                 case 3:
-                    System.out.println("\nThank you for using the Library Management System!");
+                    System.out.println(
+                            "\nThank you for using the Library Management System!"
+                    );
                     scanner.close();
                     return;
 
                 default:
-                    System.out.println("\nInvalid choice. Please try again.");
+                    System.out.println("\nInvalid choice.");
             }
         }
     }
 
-    // ---------------------------------------------------------
+    // =========================================================
     // SAMPLE DATA
-    // ---------------------------------------------------------
+    // =========================================================
 
     private static void addSampleData() {
 
         bookService.addBook(
-                new Book(1, "Clean Code", "Robert Martin",
-                        "9780132350884", "Programming")
+                new Book(
+                        1,
+                        "Clean Code",
+                        "Robert Martin",
+                        "9780132350884",
+                        "Programming"
+                )
         );
 
         bookService.addBook(
-                new Book(2, "Java Programming", "James Gosling",
-                        "9780134685991", "Programming")
+                new Book(
+                        2,
+                        "Java Programming",
+                        "James Gosling",
+                        "9780134685991",
+                        "Programming"
+                )
         );
 
         bookService.addBook(
-                new Book(3, "The Alchemist", "Paulo Coelho",
-                        "9780061122415", "Fiction")
+                new Book(
+                        3,
+                        "The Alchemist",
+                        "Paulo Coelho",
+                        "9780061122415",
+                        "Fiction"
+                )
         );
 
         memberService.addMember(
-                new Member(1, "Priyanshu", "priyanshu@gmail.com", "MEM001")
+                new Member(
+                        1,
+                        "Priyanshu",
+                        "priyanshu@gmail.com",
+                        "MEM001",
+                        "member123"
+                )
         );
 
         memberService.addMember(
-                new Member(2, "Rahul", "rahul@gmail.com", "MEM002")
+                new Member(
+                        2,
+                        "Rahul",
+                        "rahul@gmail.com",
+                        "MEM002",
+                        "rahul123"
+                )
         );
     }
 
-    // ---------------------------------------------------------
+    // =========================================================
+    // LIBRARIAN LOGIN
+    // =========================================================
+
+    private static void librarianLogin() {
+
+        System.out.println("\n========== LIBRARIAN LOGIN ==========");
+
+        System.out.print("Username: ");
+        String username = scanner.nextLine();
+
+        System.out.print("Password: ");
+        String password = scanner.nextLine();
+
+        if (username.equals(LIBRARIAN_USERNAME)
+                && password.equals(LIBRARIAN_PASSWORD)) {
+
+            System.out.println("\nLogin successful!");
+
+            librarianDashboard();
+
+        } else {
+
+            System.out.println("\nInvalid username or password.");
+        }
+    }
+
+    // =========================================================
+    // MEMBER LOGIN
+    // =========================================================
+
+    private static void memberLogin() {
+
+        System.out.println("\n============ MEMBER LOGIN ============");
+
+        System.out.print("Membership ID: ");
+        String membershipId = scanner.nextLine();
+
+        System.out.print("Password: ");
+        String password = scanner.nextLine();
+
+        Member member =
+                memberService.findByMembershipId(membershipId);
+
+        if (member != null
+                && member.getPassword().equals(password)) {
+
+            System.out.println(
+                    "\nLogin successful! Welcome, "
+                            + member.getName() + "!"
+            );
+
+            memberDashboard(member);
+
+        } else {
+
+            System.out.println("\nInvalid Membership ID or password.");
+        }
+    }
+
+    // =========================================================
     // LIBRARIAN DASHBOARD
-    // ---------------------------------------------------------
+    // =========================================================
 
     private static void librarianDashboard() {
 
@@ -138,9 +233,9 @@ public class LibraryManagementSystem {
         }
     }
 
-    // ---------------------------------------------------------
+    // =========================================================
     // BOOK MANAGEMENT
-    // ---------------------------------------------------------
+    // =========================================================
 
     private static void bookManagement() {
 
@@ -182,7 +277,7 @@ public class LibraryManagementSystem {
                     return;
 
                 default:
-                    System.out.println("\nInvalid choice.");
+                    System.out.println("Invalid choice.");
             }
         }
     }
@@ -210,9 +305,9 @@ public class LibraryManagementSystem {
         System.out.print("Enter genre: ");
         String genre = scanner.nextLine();
 
-        Book book = new Book(id, title, author, isbn, genre);
-
-        bookService.addBook(book);
+        bookService.addBook(
+                new Book(id, title, author, isbn, genre)
+        );
 
         System.out.println("\nBook added successfully!");
     }
@@ -271,8 +366,6 @@ public class LibraryManagementSystem {
             return;
         }
 
-        System.out.println("\nSearch Results:");
-
         for (Book book : results) {
             displayBook(book);
         }
@@ -301,13 +394,10 @@ public class LibraryManagementSystem {
         System.out.print("Enter new genre: ");
         String genre = scanner.nextLine();
 
-        boolean updated =
-                bookService.updateBook(id, title, author, isbn, genre);
+        if (bookService.updateBook(
+                id, title, author, isbn, genre)) {
 
-        if (updated) {
             System.out.println("\nBook updated successfully!");
-        } else {
-            System.out.println("\nUnable to update book.");
         }
     }
 
@@ -315,9 +405,7 @@ public class LibraryManagementSystem {
 
         int id = readInt("Enter Book ID to delete: ");
 
-        boolean deleted = bookService.deleteBook(id);
-
-        if (deleted) {
+        if (bookService.deleteBook(id)) {
             System.out.println("\nBook deleted successfully!");
         } else {
             System.out.println("\nBook not found.");
@@ -332,13 +420,13 @@ public class LibraryManagementSystem {
         System.out.println("Author: " + book.getAuthor());
         System.out.println("ISBN: " + book.getIsbn());
         System.out.println("Genre: " + book.getGenre());
-        System.out.println("Status: " +
-                (book.isAvailable() ? "Available" : "Borrowed"));
+        System.out.println("Status: "
+                + (book.isAvailable() ? "Available" : "Borrowed"));
     }
 
-    // ---------------------------------------------------------
+    // =========================================================
     // MEMBER MANAGEMENT
-    // ---------------------------------------------------------
+    // =========================================================
 
     private static void memberManagement() {
 
@@ -400,10 +488,18 @@ public class LibraryManagementSystem {
         System.out.print("Enter membership ID: ");
         String membershipId = scanner.nextLine();
 
-        Member member =
-                new Member(id, name, email, membershipId);
+        System.out.print("Enter password: ");
+        String password = scanner.nextLine();
 
-        memberService.addMember(member);
+        memberService.addMember(
+                new Member(
+                        id,
+                        name,
+                        email,
+                        membershipId,
+                        password
+                )
+        );
 
         System.out.println("\nMember added successfully!");
     }
@@ -412,16 +508,14 @@ public class LibraryManagementSystem {
 
         System.out.println("\n---------- ALL MEMBERS ----------");
 
-        List<Member> members = memberService.getAllMembers();
-
-        for (Member member : members) {
+        for (Member member : memberService.getAllMembers()) {
 
             System.out.println("----------------------------------------");
             System.out.println("ID: " + member.getId());
             System.out.println("Name: " + member.getName());
             System.out.println("Email: " + member.getEmail());
-            System.out.println("Membership ID: " +
-                    member.getMembershipId());
+            System.out.println("Membership ID: "
+                    + member.getMembershipId());
         }
     }
 
@@ -445,12 +539,14 @@ public class LibraryManagementSystem {
         System.out.print("Enter new membership ID: ");
         String membershipId = scanner.nextLine();
 
-        boolean updated =
-                memberService.updateMember(
-                        id, name, email, membershipId
-                );
+        System.out.print("Enter new password: ");
+        String password = scanner.nextLine();
 
-        if (updated) {
+        if (memberService.updateMember(
+                id, name, email, membershipId)) {
+
+            member.setPassword(password);
+
             System.out.println("\nMember updated successfully!");
         }
     }
@@ -459,18 +555,16 @@ public class LibraryManagementSystem {
 
         int id = readInt("Enter Member ID to delete: ");
 
-        boolean deleted = memberService.deleteMember(id);
-
-        if (deleted) {
+        if (memberService.deleteMember(id)) {
             System.out.println("\nMember deleted successfully!");
         } else {
             System.out.println("\nMember not found.");
         }
     }
 
-    // ---------------------------------------------------------
+    // =========================================================
     // TRANSACTION MANAGEMENT
-    // ---------------------------------------------------------
+    // =========================================================
 
     private static void transactionManagement() {
 
@@ -525,10 +619,7 @@ public class LibraryManagementSystem {
             return;
         }
 
-        boolean success =
-                transactionService.borrowBook(book, memberId);
-
-        if (success) {
+        if (transactionService.borrowBook(book, memberId)) {
 
             System.out.println("\nBook borrowed successfully!");
 
@@ -538,6 +629,7 @@ public class LibraryManagementSystem {
             );
 
         } else {
+
             System.out.println("\nBook is currently unavailable.");
         }
     }
@@ -554,10 +646,7 @@ public class LibraryManagementSystem {
             return;
         }
 
-        boolean success =
-                transactionService.returnBook(book, memberId);
-
-        if (success) {
+        if (transactionService.returnBook(book, memberId)) {
             System.out.println("\nBook returned successfully!");
         } else {
             System.out.println("\nReturn transaction not found.");
@@ -579,24 +668,24 @@ public class LibraryManagementSystem {
         for (Transaction transaction : transactions) {
 
             System.out.println("----------------------------------------");
-            System.out.println("Transaction ID: " +
-                    transaction.getId());
-            System.out.println("Book ID: " +
-                    transaction.getBookId());
-            System.out.println("Member ID: " +
-                    transaction.getMemberId());
-            System.out.println("Borrow Date: " +
-                    transaction.getBorrowDate());
-            System.out.println("Return Date: " +
-                    (transaction.getReturnDate() == null
-                            ? "Not Returned"
-                            : transaction.getReturnDate()));
+            System.out.println("Transaction ID: "
+                    + transaction.getId());
+            System.out.println("Book ID: "
+                    + transaction.getBookId());
+            System.out.println("Member ID: "
+                    + transaction.getMemberId());
+            System.out.println("Borrow Date: "
+                    + transaction.getBorrowDate());
+            System.out.println("Return Date: "
+                    + (transaction.getReturnDate() == null
+                    ? "Not Returned"
+                    : transaction.getReturnDate()));
         }
     }
 
-    // ---------------------------------------------------------
-    // NOTIFICATION MANAGEMENT
-    // ---------------------------------------------------------
+    // =========================================================
+    // NOTIFICATIONS
+    // =========================================================
 
     private static void notificationManagement() {
 
@@ -716,9 +805,9 @@ public class LibraryManagementSystem {
         System.out.println("\nNew-arrival notification sent!");
     }
 
-    // ---------------------------------------------------------
+    // =========================================================
     // INVENTORY REPORT
-    // ---------------------------------------------------------
+    // =========================================================
 
     private static void inventoryReport() {
 
@@ -737,31 +826,20 @@ public class LibraryManagementSystem {
         }
 
         System.out.println("\n========== INVENTORY REPORT ==========");
-        System.out.println("Total Books     : " + books.size());
-        System.out.println("Available Books : " + available);
-        System.out.println("Borrowed Books  : " + borrowed);
-        System.out.println("Total Members   : " +
-                memberService.getAllMembers().size());
-        System.out.println("Total Transactions: " +
-                transactionService.getAllTransactions().size());
+        System.out.println("Total Books       : " + books.size());
+        System.out.println("Available Books   : " + available);
+        System.out.println("Borrowed Books    : " + borrowed);
+        System.out.println("Total Members     : "
+                + memberService.getAllMembers().size());
+        System.out.println("Total Transactions: "
+                + transactionService.getAllTransactions().size());
     }
 
-    // ---------------------------------------------------------
+    // =========================================================
     // MEMBER DASHBOARD
-    // ---------------------------------------------------------
+    // =========================================================
 
-    private static void memberDashboard() {
-
-        int memberId =
-                readInt("\nEnter your Member ID: ");
-
-        Member member =
-                memberService.findMemberById(memberId);
-
-        if (member == null) {
-            System.out.println("Member not found.");
-            return;
-        }
+    private static void memberDashboard(Member member) {
 
         while (true) {
 
@@ -826,16 +904,10 @@ public class LibraryManagementSystem {
             return;
         }
 
-        boolean success =
-                transactionService.borrowBook(
-                        book, member.getId()
-                );
+        if (transactionService.borrowBook(
+                book, member.getId())) {
 
-        if (success) {
-
-            System.out.println(
-                    "\nBook borrowed successfully!"
-            );
+            System.out.println("\nBook borrowed successfully!");
 
             notificationService.sendNotification(
                     member,
@@ -843,6 +915,7 @@ public class LibraryManagementSystem {
             );
 
         } else {
+
             System.out.println(
                     "\nBook is currently unavailable."
             );
@@ -860,16 +933,13 @@ public class LibraryManagementSystem {
             return;
         }
 
-        boolean success =
-                transactionService.returnBook(
-                        book, member.getId()
-                );
+        if (transactionService.returnBook(
+                book, member.getId())) {
 
-        if (success) {
-            System.out.println(
-                    "\nBook returned successfully!"
-            );
+            System.out.println("\nBook returned successfully!");
+
         } else {
+
             System.out.println(
                     "\nReturn transaction not found."
             );
@@ -893,16 +963,16 @@ public class LibraryManagementSystem {
         for (Transaction transaction : history) {
 
             System.out.println("----------------------------------------");
-            System.out.println("Transaction ID: " +
-                    transaction.getId());
-            System.out.println("Book ID: " +
-                    transaction.getBookId());
-            System.out.println("Borrow Date: " +
-                    transaction.getBorrowDate());
-            System.out.println("Return Date: " +
-                    (transaction.getReturnDate() == null
-                            ? "Not Returned"
-                            : transaction.getReturnDate()));
+            System.out.println("Transaction ID: "
+                    + transaction.getId());
+            System.out.println("Book ID: "
+                    + transaction.getBookId());
+            System.out.println("Borrow Date: "
+                    + transaction.getBorrowDate());
+            System.out.println("Return Date: "
+                    + (transaction.getReturnDate() == null
+                    ? "Not Returned"
+                    : transaction.getReturnDate()));
         }
     }
 
@@ -912,8 +982,9 @@ public class LibraryManagementSystem {
         System.out.println("Member ID: " + member.getId());
         System.out.println("Name: " + member.getName());
         System.out.println("Email: " + member.getEmail());
-        System.out.println("Membership ID: " +
-                member.getMembershipId());
+        System.out.println("Membership ID: "
+                + member.getMembershipId());
+        System.out.println("Password: ********");
     }
 
     private static void memberNotifications(Member member) {
@@ -940,9 +1011,9 @@ public class LibraryManagementSystem {
         }
     }
 
-    // ---------------------------------------------------------
+    // =========================================================
     // INPUT HELPER
-    // ---------------------------------------------------------
+    // =========================================================
 
     private static int readInt(String message) {
 
@@ -952,11 +1023,9 @@ public class LibraryManagementSystem {
 
             try {
 
-                int value = Integer.parseInt(
+                return Integer.parseInt(
                         scanner.nextLine()
                 );
-
-                return value;
 
             } catch (NumberFormatException e) {
 

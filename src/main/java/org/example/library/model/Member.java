@@ -6,12 +6,16 @@ public class Member {
     private String name;
     private String email;
     private String membershipId;
+    private String password;
 
-    public Member(int id, String name, String email, String membershipId) {
+    public Member(int id, String name, String email,
+                  String membershipId, String password) {
+
         this.id = id;
         this.name = name;
         this.email = email;
         this.membershipId = membershipId;
+        this.password = password;
     }
 
     public int getId() {
@@ -30,6 +34,10 @@ public class Member {
         return membershipId;
     }
 
+    public String getPassword() {
+        return password;
+    }
+
     public void setName(String name) {
         this.name = name;
     }
@@ -40,5 +48,9 @@ public class Member {
 
     public void setMembershipId(String membershipId) {
         this.membershipId = membershipId;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }
